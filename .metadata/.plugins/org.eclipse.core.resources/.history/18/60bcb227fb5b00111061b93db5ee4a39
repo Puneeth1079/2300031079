@@ -1,0 +1,3 @@
+spring.application.name=vehicle_maintanece_scheduler
+server.port=1977
+access.token=

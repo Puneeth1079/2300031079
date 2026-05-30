@@ -1,0 +1,44 @@
+package com.base.service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class LogService {
+
+    private final RestTemplate restTemplate;
+
+    private final String LOG_URL = "http://4.224.186.213/evaluation-service/logs";
+
+    private final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiIyMzAwMDMxMDc5Y3NlaDFAZ21haWwuY29tIiwiZXhwIjoxNzgwMTE5ODI4LCJpYXQiOjE3ODAxMTg5MjgsImlzcyI6IkFmZm9yZCBNZWRpY2FsIFRlY2hub2xvZ2llcyBQcml2YXRlIExpbWl0ZWQiLCJqdGkiOiI3MzExN2Q4Ny0xODNiLTQ0Y2UtYmZjMS01YzQ0MWQ4ODc5NjIiLCJsb2NhbGUiOiJlbi1JTiIsIm5hbWUiOiJhY2h1dGhhIHYgcyBtb2hhbiBzcmkgcHVuZWV0aCIsInN1YiI6ImJhNThkMGMxLTkzM2ItNDcyYy05N2RjLTM3YWMxMWFiNTkyYSJ9LCJlbWFpbCI6IjIzMDAwMzEwNzljc2VoMUBnbWFpbC5jb20iLCJuYW1lIjoiYWNodXRoYSB2IHMgbW9oYW4gc3JpIHB1bmVldGgiLCJyb2xsTm8iOiJhYTFiYiIsImFjY2Vzc0NvZGUiOiJBdnJBQUsiLCJjbGllbnRJRCI6ImJhNThkMGMxLTkzM2ItNDcyYy05N2RjLTM3YWMxMWFiNTkyYSIsImNsaWVudFNlY3JldCI6IlVRQXRLRmRxdXlGVGpNR2sifQ.XJaESLIhNw5srZIzoprCZeDhwHbkZ8ywtTxKIC5Ls6w";
+
+    public LogService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public void log(String level, String packageName, String message) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(TOKEN);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("stack", "backend");
+            body.put("level", level);
+            body.put("package", packageName);
+            body.put("message", message);
+
+            HttpEntity<Map<String, String>> request =
+                    new HttpEntity<>(body, headers);
+
+            restTemplate.postForEntity(LOG_URL, request, String.class);
+
+        } catch (Exception e) {
+            System.out.println("Log failed: " + e.getMessage());
+        }
+    }
+}

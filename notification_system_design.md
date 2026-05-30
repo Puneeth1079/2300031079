@@ -145,8 +145,35 @@ Result = 80
 
 Event = 50
 
+Swagger Documentation :
+
+To make testing and API exploration easier, Swagger/OpenAPI has been integrated into the project.
+
+Dependency Used:
+
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.8.5</version>
+</dependency>
+
+After running the Spring Boot application, the API documentation can be accessed using:
+
+Swagger UI:
+
+http://localhost:1977/swagger-ui/index.html
+
+OpenAPI Specification:
+
+http://localhost:1977/v3/api-docs
+
+Swagger was included to simplify API testing, endpoint verification, and request/response visualization during development.
+
 To efficiently retrieve high-priority notifications, I would use a Priority Queue (Max Heap).
 
 This allows the system to quickly identify the most important notifications while maintaining good performance even when the number of notifications grows significantly.
 
 Overall, this design provides scalability, efficient querying, fast notification delivery, and a better experience for students using the platform.
+
+The scheduler logic, API structure, logging middleware, and optimization algorithm are implemented.
+The external API call may return 401 because the token was generated with incorrect registration details.
