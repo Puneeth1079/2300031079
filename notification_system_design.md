@@ -8,6 +8,10 @@ Registration Response
 
 ![Registration](images/Registration.png)
 
+Token Generation
+
+![Token Generation](images/Authentication.png)
+
 Swagger Documentation
 
 ![Swagger](images/Swagger.png)
