@@ -1,0 +1,19 @@
+package com.base.controller;
+
+@RestController
+public class TestController {
+
+    @Autowired
+    private LogService logService;
+
+    @GetMapping("/test")
+    public String test() {
+
+        logService.log(
+                "info",
+                "controller",
+                "Test API called");
+
+        return "Success";
+    }
+}

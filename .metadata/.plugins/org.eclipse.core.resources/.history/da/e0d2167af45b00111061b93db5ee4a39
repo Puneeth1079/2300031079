@@ -1,0 +1,30 @@
+package com.base.controller;
+
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+@RestController
+public class TestController {
+
+    @GetMapping("/test-api")
+    public Object testApi() {
+
+        String token = "";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        return restTemplate.exchange(
+                "http://4.224.186.213/evaluation-service/depots",
+                HttpMethod.GET,
+                entity,
+                String.class
+        ).getBody();
+    }
+}

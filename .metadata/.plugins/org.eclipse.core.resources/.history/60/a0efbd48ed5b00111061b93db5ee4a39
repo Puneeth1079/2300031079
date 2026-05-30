@@ -1,0 +1,12 @@
+package com.base.config;
+
+import org.springframework.beans.factory.annotation.Configurable;
+
+@Configurable
+public class RestTemplateConfig {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}

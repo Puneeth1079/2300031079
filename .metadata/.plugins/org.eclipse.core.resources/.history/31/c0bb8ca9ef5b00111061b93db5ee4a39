@@ -1,0 +1,121 @@
+package com.base.service;
+
+package com.base.service;
+
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
+
+@Service
+public class SchedulerService {
+
+    private final RestTemplate restTemplate;
+    private final LogService logService;
+
+    private final String DEPOT_URL = "http://4.224.186.213/evaluation-service/depots";
+    private final String VEHICLE_URL = "http://4.224.186.213/evaluation-service/vehicles";
+    private final String TOKEN = "";
+
+    public SchedulerService(RestTemplate restTemplate, LogService logService) {
+        this.restTemplate = restTemplate;
+        this.logService = logService;
+    }
+
+    public Object createSchedule() {
+
+        logService.log("info", "service", "Vehicle scheduling started");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(TOKEN);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        Map depotResponse = restTemplate.exchange(
+                DEPOT_URL,
+                HttpMethod.GET,
+                entity,
+                Map.class
+        ).getBody();
+
+        Map vehicleResponse = restTemplate.exchange(
+                VEHICLE_URL,
+                HttpMethod.GET,
+                entity,
+                Map.class
+        ).getBody();
+
+        List<Map<String, Object>> depots =
+                (List<Map<String, Object>>) depotResponse.get("depots");
+
+        List<Map<String, Object>> vehicles =
+                (List<Map<String, Object>>) vehicleResponse.get("vehicles");
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Map<String, Object> depot : depots) {
+
+            int depotId = (int) depot.get("ID");
+            int budget = (int) depot.get("MechanicHours");
+
+            Map<String, Object> schedule = solveKnapsack(depotId, budget, vehicles);
+            result.add(schedule);
+        }
+
+        logService.log("info", "service", "Vehicle scheduling completed");
+
+        Map<String, Object> finalResponse = new HashMap<>();
+        finalResponse.put("schedules", result);
+
+        return finalResponse;
+    }
+
+    private Map<String, Object> solveKnapsack(
+            int depotId,
+            int budget,
+            List<Map<String, Object>> vehicles
+    ) {
+
+        int n = vehicles.size();
+        int[][] dp = new int[n + 1][budget + 1];
+
+        for (int i = 1; i <= n; i++) {
+            int duration = (int) vehicles.get(i - 1).get("Duration");
+            int impact = (int) vehicles.get(i - 1).get("Impact");
+
+            for (int b = 0; b <= budget; b++) {
+                dp[i][b] = dp[i - 1][b];
+
+                if (duration <= b) {
+                    dp[i][b] = Math.max(
+                            dp[i][b],
+                            impact + dp[i - 1][b - duration]
+                    );
+                }
+            }
+        }
+
+        List<String> selectedTasks = new ArrayList<>();
+        int totalHours = 0;
+        int b = budget;
+
+        for (int i = n; i > 0; i--) {
+            if (dp[i][b] != dp[i - 1][b]) {
+                Map<String, Object> vehicle = vehicles.get(i - 1);
+
+                selectedTasks.add((String) vehicle.get("TaskID"));
+                totalHours += (int) vehicle.get("Duration");
+                b -= (int) vehicle.get("Duration");
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("depotId", depotId);
+        response.put("availableHours", budget);
+        response.put("usedHours", totalHours);
+        response.put("maxImpact", dp[n][budget]);
+        response.put("selectedTasks", selectedTasks);
+
+        return response;
+    }
+}

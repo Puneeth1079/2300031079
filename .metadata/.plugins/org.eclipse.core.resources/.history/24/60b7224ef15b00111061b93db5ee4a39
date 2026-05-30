@@ -1,0 +1,40 @@
+package com.base.service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class LogService {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private final String url = "http://4.224.186.213/evaluation-service/logs";
+
+    private final String TOKEN = "";
+
+    public void log(String level, String packageName, String message) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(token);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("stack", "abackend");
+            body.put("level", level);
+            body.put("package", packageName);
+            body.put("message", message);
+
+            HttpEntity<Map<String, String>> request =
+                    new HttpEntity<>(body, headers);
+
+            restTemplate.postForEntity(url, request, String.class);
+
+        } catch (Exception e) {
+            System.out.println("Log failed: " + e.getMessage());
+        }
+    }
+}
