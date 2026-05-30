@@ -1,5 +1,17 @@
 Notification System Design
 
+Project Architecture
+
+![Architecture](images/Architecture.png)
+
+Registration Response
+
+![Registration](images/Registration.png)
+
+Swagger Documentation
+
+![Swagger](images/Swagger.png)
+
 Stage 1
 
 To support a campus notification platform, I would create APIs for viewing notifications, creating notifications, marking notifications as read, and deleting notifications. These APIs would allow students to access their notifications and administrators to send updates.
